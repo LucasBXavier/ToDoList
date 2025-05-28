@@ -8,6 +8,7 @@ class TodolistApplicationTests {
 
     @Test
     void contextLoads() {
+        TodolistApplication.main(new String[]{});
     }
 
 }

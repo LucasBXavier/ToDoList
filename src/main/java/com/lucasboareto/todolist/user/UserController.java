@@ -1,19 +1,19 @@
 package com.lucasboareto.todolist.user;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
     private IUserRepository userRepository;
 
-    @PostMapping("/")
+    @PostMapping("/cadastro")
     public ResponseEntity create(@RequestBody UserModel userModel) {
         var user = this.userRepository.findByUserName(userModel.getUserName());
 
@@ -27,6 +27,9 @@ public class UserController {
         }
     }
 
-
-
+    @GetMapping("/usuario")
+    public ResponseEntity getAll() {
+        var users = this.userRepository.findAll();
+        return ResponseEntity.ok().body(users);
+    }
 }
