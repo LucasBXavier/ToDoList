@@ -1,0 +1,11 @@
+{
+  "description": "Revisar o conteúdo de Spring Boot",
+  "title": "Revisão Spring",
+  "startAt": "2025-06-01T09:00:00",
+  "endAt": "2025-06-01T11:00:00",
+  "priority": "ALTA",
+  "idUser": "123e4567-e89b-12d3-a456-426614174000"
+}
+
+
+//template para consultas no postman
