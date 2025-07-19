@@ -16,7 +16,7 @@ public class UserController {
 
     private IUserRepository userRepository;
 
-    @PostMapping("/cadastroUsuario")
+    @PostMapping
     public ResponseEntity create(@RequestBody UserModel userModel) {
         var user = this.userRepository.findByUserName(userModel.getUserName());
         if(user != null) {
@@ -28,13 +28,13 @@ public class UserController {
             return ResponseEntity.ok().body("Usuário: " + userModel.getUserName() + " criado com sucesso");
         }
     }
-    @GetMapping("/usuario")
+    @GetMapping
     public ResponseEntity getAll() {
         var users = this.userRepository.findAll();
         return ResponseEntity.ok().body(users);
     }
 
-    @GetMapping("/usuario/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity getById(@PathVariable UUID id) {
         var user = this.userRepository.findById(id);
         if(user.isEmpty()) {

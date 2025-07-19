@@ -12,7 +12,7 @@ public class TaskController {
 
     private ITaskRepository repository;
 
-    @PostMapping("/cadastroTask")
+    @PostMapping
     public ResponseEntity<String> create(@RequestBody TaskModel taskModel) {
         var task = repository.findByTitle(taskModel.getTitle());
         if(task != null) {
@@ -23,7 +23,7 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/getTask")
+    @GetMapping
     public TaskModel getTask() {
         var tasks = this.repository.findAll();
         return tasks.get(0);
