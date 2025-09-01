@@ -1,8 +1,13 @@
 package com.lucasboareto.todolist.task;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @RestController
@@ -13,14 +18,20 @@ public class TaskController {
     private ITaskRepository repository;
 
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody TaskModel taskModel) {
-        var task = repository.findByTitle(taskModel.getTitle());
-        if(task != null) {
-            throw new RuntimeException("Tarefa já existe.");
-        }else {
-            this.repository.save(taskModel);
-            return ResponseEntity.ok().body("Tarefa: " + taskModel.getTitle() + " criada com sucesso");
+    public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
+        taskModel.setIdUser((UUID) request.getAttribute("userId"));
+
+        var currentDate = LocalDateTime.now();
+
+        if (currentDate.isAfter(taskModel.getStartAt()) || currentDate.isAfter(taskModel.getEndAt())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de início / data de termino deve ser maior que a data atual");
         }
+
+        if (taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de início deve ser menor que a data de termino");
+        }
+        var task = this.repository.save(taskModel);
+        return ResponseEntity.status(HttpStatus.OK).body(task);
     }
 
     @GetMapping
