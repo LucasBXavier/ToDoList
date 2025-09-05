@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -17,9 +18,10 @@ public class TaskController {
 
     private ITaskRepository repository;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
-        taskModel.setIdUser((UUID) request.getAttribute("userId"));
+        var idUser = (request.getAttribute("idUser"));
+        taskModel.setIdUser((UUID) idUser);
 
         var currentDate = LocalDateTime.now();
 
@@ -34,9 +36,17 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(task);
     }
 
-    @GetMapping
-    public TaskModel getTask() {
-        var tasks = this.repository.findAll();
-        return tasks.get(0);
+    @GetMapping("/")
+    public List<TaskModel> getTaskList(HttpServletRequest request) {
+        var idUser = (request.getAttribute("idUser"));
+        return this.repository.findByIdUser((UUID) idUser);
+    }
+
+    @PutMapping("/{id}")
+    public TaskModel update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
+        var idUser = (request.getAttribute("idUser"));
+        taskModel.setIdUser((UUID) idUser);
+        taskModel.setIdUser(id);
+        return this.repository.save(taskModel);
     }
 }

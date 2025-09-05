@@ -2,11 +2,10 @@ package com.lucasboareto.todolist.user;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.List;
 
 
 @RestController
@@ -29,18 +28,7 @@ public class UserController {
         }
     }
     @GetMapping
-    public ResponseEntity getAll() {
-        var users = this.userRepository.findAll();
-        return ResponseEntity.ok().body(users);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity getById(@PathVariable UUID id) {
-        var user = this.userRepository.findById(id);
-        if(user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
-        } else {
-            return ResponseEntity.ok().body(user.get());
-        }
+    public List<UserModel> getAll() {
+        return this.userRepository.findAll();
     }
 }
