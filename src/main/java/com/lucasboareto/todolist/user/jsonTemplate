@@ -1,7 +1,7 @@
 //template para consultas no postman
 
 {
-  "userName": "Lucas_bx",
-  "name": "lucas",
-  "password": "lucas123"
+  "userName": "JohnDoe",
+  "name": "john doe",
+  "password": "123456"
 }

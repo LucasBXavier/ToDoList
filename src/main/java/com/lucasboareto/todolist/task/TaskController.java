@@ -1,5 +1,6 @@
 package com.lucasboareto.todolist.task;
 
+import com.lucasboareto.todolist.utils.utils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,10 +44,22 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public TaskModel update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
+    public ResponseEntity update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
+        var task = this.repository.findById(id).orElse(null);
+
+        if(task == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarefa não encontrada");
+        }
+
         var idUser = (request.getAttribute("idUser"));
-        taskModel.setIdUser((UUID) idUser);
-        taskModel.setIdUser(id);
-        return this.repository.save(taskModel);
+
+        if(!task.getIdUser().equals(idUser)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Você não tem permissão para atualizar essa tarefa");
+        }
+
+        utils.copyNonNullProperties(taskModel, task);
+        var taskUpdated = this.repository.save(task);
+        return ResponseEntity.ok().body(taskUpdated);
     }
 }
