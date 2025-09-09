@@ -93,7 +93,11 @@ curl http://localhost:8080/tasks/
 
 ### ✏️ Atualizar tarefa
 ```bash
-curl -X PUT http://localhost:8080/api/tasks/1   -H "Content-Type: application/json"   -d '{"title":"Comprar café","completed":true}'
+curl -X PUT http://localhost:8080/api/tasks/1   -H "Content-Type: application/json"   -d 
+'{
+  "description":"se aprofundando em angular e spring"
+  "title":"revisão de angular com spring",
+}'
 ```
 
 ---
