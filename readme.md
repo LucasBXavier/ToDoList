@@ -60,14 +60,13 @@ A API ficará disponível em:
 | POST   | `/tasks/`      | Cria nova tarefa         |
 | PUT    | `/tasks/{id}` | Atualiza tarefa existente|
 
----
 
 **Base URL:** `http://localhost:8080/users`
 
 | Método | Endpoint | Descrição                |
 |--------|----------|--------------------------|
-| GET    | `/users` | Lista todas as tarefas   |
-| POST   | `/users` | Cria nova tarefa         |
+| GET    | `/users` | Lista todos os usuarios   |
+| POST   | `/users` | Cria novo usuario         |
 
 ---
 
@@ -93,7 +92,7 @@ curl http://localhost:8080/tasks/
 
 ### ✏️ Atualizar tarefa
 ```bash
-curl -X PUT http://localhost:8080/api/tasks/1   -H "Content-Type: application/json"   -d 
+curl -X PUT http://localhost:8080/tasks/{id da task}   -H "Content-Type: application/json"   -d 
 '{
   "description":"se aprofundando em angular e spring"
   "title":"revisão de angular com spring",
