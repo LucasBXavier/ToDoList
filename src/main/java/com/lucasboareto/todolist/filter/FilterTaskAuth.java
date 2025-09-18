@@ -2,7 +2,7 @@ package com.lucasboareto.todolist.filter;
 
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.lucasboareto.todolist.user.IUserRepository;
+import com.lucasboareto.todolist.Repository.IUserRepository;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

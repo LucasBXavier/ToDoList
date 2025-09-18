@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static org.springframework.beans.BeanUtils.copyProperties;
 
-public class utils {
+public class Utils {
 
     public static void copyNonNullProperties(Object src, Object target) {
         copyProperties(src, target, getNullPropertyNames(src));

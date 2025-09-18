@@ -1,11 +1,13 @@
 package com.lucasboareto.todolist.user;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.lucasboareto.todolist.Repository.IUserRepository;
+import com.lucasboareto.todolist.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -14,21 +16,20 @@ import java.util.List;
 public class UserController {
 
     private IUserRepository userRepository;
+    private UserService userService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity create(@RequestBody UserModel userModel) {
-        var user = this.userRepository.findByUserName(userModel.getUserName());
-        if(user != null) {
-            return ResponseEntity.badRequest().body("Usuário já existe");
-        }else{
-            var passwordHash = BCrypt.withDefaults().hashToString(12, userModel.getPassword().toCharArray());
-            userModel.setPassword(passwordHash);
-            this.userRepository.save(userModel);
-            return ResponseEntity.ok().body("Usuário: " + userModel.getUserName() + " criado com sucesso");
-        }
+        return userService.createUser(userModel);
     }
-    @GetMapping
+    @GetMapping("/")
     public List<UserModel> getAll() {
         return this.userRepository.findAll();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable UUID id) {
+        return userService.deleteUser(id);
+    }
+
 }

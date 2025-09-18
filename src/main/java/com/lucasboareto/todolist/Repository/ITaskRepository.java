@@ -1,5 +1,6 @@
-package com.lucasboareto.todolist.task;
+package com.lucasboareto.todolist.Repository;
 
+import com.lucasboareto.todolist.task.TaskModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

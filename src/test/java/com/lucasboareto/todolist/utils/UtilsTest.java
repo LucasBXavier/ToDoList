@@ -20,7 +20,7 @@ class UtilsTest {
         destino.setDescription("desc destino");
         destino.setPriority("alta");
 
-        utils.copyNonNullProperties(origem, destino);
+        Utils.copyNonNullProperties(origem, destino);
 
         assertEquals("desc origem", destino.getDescription());
         assertEquals("alta", destino.getPriority());
@@ -32,7 +32,7 @@ class UtilsTest {
         origem.setDescription(null);
         origem.setPriority("media");
 
-        String[] propriedadesNulas = utils.getNullPropertyNames(origem);
+        String[] propriedadesNulas = Utils.getNullPropertyNames(origem);
 
         assertTrue(java.util.Arrays.asList(propriedadesNulas).contains("description"));
     }

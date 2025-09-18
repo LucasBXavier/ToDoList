@@ -1,136 +1,94 @@
 package com.lucasboareto.todolist.task;
 
+import com.lucasboareto.todolist.Repository.ITaskRepository;
+import com.lucasboareto.todolist.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TaskControllerTest {
 
     @Mock
-    private ITaskRepository taskRepository;
+    private TaskService taskService;
 
-    @InjectMocks
-    private TaskController taskController;
+    @Mock
+    private ITaskRepository repository;
 
     @Mock
     private HttpServletRequest request;
 
+    @InjectMocks
+    private TaskController taskController;
+
+
     @Test
-    void createReturnsBadRequestWhenStartDateOrEndDateIsInThePast() {
-        TaskModel taskModel = new TaskModel();
-        taskModel.setStartAt(LocalDateTime.now().minusDays(1));
-        taskModel.setEndAt(LocalDateTime.now().plusDays(1));
+    void shouldCreateTaskSuccessfully() {
+        TaskModel task = new TaskModel();
+        ResponseEntity expectedResponse = ResponseEntity.status(HttpStatus.CREATED).build();
 
-        ResponseEntity response = taskController.create(taskModel, request);
+        when(taskService.createTask(any(TaskModel.class), any(HttpServletRequest.class))).thenReturn(expectedResponse);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("A data de início / data de termino deve ser maior que a data atual", response.getBody());
+        ResponseEntity response = taskController.create(task, request);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(taskService, times(1)).createTask(task, request);
     }
 
     @Test
-    void createReturnsBadRequestWhenStartDateIsAfterEndDate() {
-        TaskModel taskModel = new TaskModel();
-        taskModel.setStartAt(LocalDateTime.now().plusDays(2));
-        taskModel.setEndAt(LocalDateTime.now().plusDays(1));
+    void shouldReturnTaskList() {
+        UUID userId = UUID.randomUUID();
+        TaskModel task1 = new TaskModel();
+        TaskModel task2 = new TaskModel();
+        List<TaskModel> expectedList = Arrays.asList(task1, task2);
 
-        ResponseEntity response = taskController.create(taskModel, request);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("A data de início deve ser menor que a data de termino", response.getBody());
-    }
-
-    @Test
-    void createReturnsOkWhenTaskIsCreatedSuccessfully() {
-        TaskModel taskModel = new TaskModel();
-        taskModel.setStartAt(LocalDateTime.now().plusDays(1));
-        taskModel.setEndAt(LocalDateTime.now().plusDays(2));
-        UUID idUser = UUID.randomUUID();
-
-        Mockito.when(request.getAttribute("idUser")).thenReturn(idUser);
-        Mockito.when(taskRepository.save(Mockito.any(TaskModel.class))).thenReturn(taskModel);
-
-        ResponseEntity response = taskController.create(taskModel, request);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(taskModel, response.getBody());
-        Mockito.verify(taskRepository).save(taskModel);
-    }
-
-    @Test
-    void getTaskListReturnsTasksForUser() {
-        UUID idUser = UUID.randomUUID();
-        List<TaskModel> tasks = List.of(new TaskModel(), new TaskModel());
-
-        Mockito.when(request.getAttribute("idUser")).thenReturn(idUser);
-        Mockito.when(taskRepository.findByIdUser(idUser)).thenReturn(tasks);
+        when(request.getAttribute("idUser")).thenReturn(userId);
+        when(repository.findByIdUser(userId)).thenReturn(expectedList);
 
         List<TaskModel> result = taskController.getTaskList(request);
 
         assertEquals(2, result.size());
-        assertEquals(tasks, result);
+        assertEquals(expectedList, result);
+        verify(repository, times(1)).findByIdUser(userId);
     }
 
     @Test
-    void updateReturnsNotFoundWhenTaskDoesNotExist() {
-        UUID taskId = UUID.randomUUID();
-        TaskModel taskModel = new TaskModel();
+    void shouldUpdateTaskSuccessfully() {
+        UUID id = UUID.randomUUID();
+        TaskModel task = new TaskModel();
+        ResponseEntity expectedResponse = ResponseEntity.ok().build();
 
-        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+        when(taskService.updateTask(any(TaskModel.class), any(HttpServletRequest.class), eq(id))).thenReturn(expectedResponse);
 
-        ResponseEntity response = taskController.update(taskModel, request, taskId);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Tarefa não encontrada", response.getBody());
-    }
-
-    @Test
-    void updateReturnsUnauthorizedWhenUserDoesNotOwnTask() {
-        UUID taskId = UUID.randomUUID();
-        UUID idUser = UUID.randomUUID();
-        TaskModel existingTask = new TaskModel();
-        existingTask.setIdUser(UUID.randomUUID());
-        TaskModel taskModel = new TaskModel();
-
-        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
-        Mockito.when(request.getAttribute("idUser")).thenReturn(idUser);
-
-        ResponseEntity response = taskController.update(taskModel, request, taskId);
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Você não tem permissão para atualizar essa tarefa", response.getBody());
-    }
-
-    @Test
-    void updateReturnsOkWhenTaskIsUpdatedSuccessfully() {
-        UUID taskId = UUID.randomUUID();
-        UUID idUser = UUID.randomUUID();
-        TaskModel existingTask = new TaskModel();
-        existingTask.setIdUser(idUser);
-        TaskModel taskModel = new TaskModel();
-
-        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
-        Mockito.when(request.getAttribute("idUser")).thenReturn(idUser);
-        Mockito.when(taskRepository.save(existingTask)).thenReturn(existingTask);
-
-        ResponseEntity response = taskController.update(taskModel, request, taskId);
+        ResponseEntity response = taskController.update(task, request, id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(existingTask, response.getBody());
-        Mockito.verify(taskRepository).save(existingTask);
+        verify(taskService, times(1)).updateTask(task, request, id);
     }
 
+    @Test
+    void shouldDeleteTaskSuccessfully() {
+        UUID id = UUID.randomUUID();
+        ResponseEntity expectedResponse = ResponseEntity.noContent().build();
+
+        when(taskService.deleteTask(id)).thenReturn(expectedResponse);
+
+        ResponseEntity response = taskController.delete(id);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(taskService, times(1)).deleteTask(id);
+    }
 }

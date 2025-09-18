@@ -1,13 +1,12 @@
 package com.lucasboareto.todolist.task;
 
-import com.lucasboareto.todolist.utils.utils;
+import com.lucasboareto.todolist.Repository.ITaskRepository;
+import com.lucasboareto.todolist.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,23 +17,11 @@ import java.util.UUID;
 public class TaskController {
 
     private ITaskRepository repository;
+    private TaskService taskService;
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
-        var idUser = (request.getAttribute("idUser"));
-        taskModel.setIdUser((UUID) idUser);
-
-        var currentDate = LocalDateTime.now();
-
-        if (currentDate.isAfter(taskModel.getStartAt()) || currentDate.isAfter(taskModel.getEndAt())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de início / data de termino deve ser maior que a data atual");
-        }
-
-        if (taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de início deve ser menor que a data de termino");
-        }
-        var task = this.repository.save(taskModel);
-        return ResponseEntity.status(HttpStatus.OK).body(task);
+        return taskService.createTask(taskModel, request);
     }
 
     @GetMapping("/")
@@ -45,21 +32,11 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
-        var task = this.repository.findById(id).orElse(null);
+        return taskService.updateTask(taskModel, request, id);
+    }
 
-        if(task == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarefa não encontrada");
-        }
-
-        var idUser = (request.getAttribute("idUser"));
-
-        if(!task.getIdUser().equals(idUser)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Você não tem permissão para atualizar essa tarefa");
-        }
-
-        utils.copyNonNullProperties(taskModel, task);
-        var taskUpdated = this.repository.save(task);
-        return ResponseEntity.ok().body(taskUpdated);
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable UUID id) {
+        return taskService.deleteTask(id);
     }
 }

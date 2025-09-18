@@ -1,7 +1,7 @@
 package com.lucasboareto.todolist.filter;
 
 
-import com.lucasboareto.todolist.user.IUserRepository;
+import com.lucasboareto.todolist.Repository.IUserRepository;
 import com.lucasboareto.todolist.user.UserModel;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
