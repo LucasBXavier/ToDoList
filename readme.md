@@ -59,14 +59,17 @@ A API ficará disponível em:
 | GET    | `/tasks/`         | Lista todas as tarefas   |
 | POST   | `/tasks/`      | Cria nova tarefa         |
 | PUT    | `/tasks/{id}` | Atualiza tarefa existente|
+| DELETE | `/tasks/{id}` | Deleta tarefa existente  |
 
 
-**Base URL:** `http://localhost:8080/users`
+**Base URL:** `http://localhost:8080/users/`
 
-| Método | Endpoint | Descrição                |
-|--------|----------|--------------------------|
-| GET    | `/users` | Lista todos os usuarios   |
-| POST   | `/users` | Cria novo usuario         |
+| Método | Endpoint      | Descrição                |
+|--------|---------------|--------------------------|
+| GET    | `/users/`     | Lista todos os usuarios  |
+| POST   | `/users/`     | Cria novo usuario        |
+| DELETE | `/users/{id}` | Deleta usuário existente |
+
 
 ---
 
